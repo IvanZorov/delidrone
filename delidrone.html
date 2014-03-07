@@ -1,0 +1,126 @@
+<!doctype html>
+
+<html>
+<head>
+	<title>DELIDRONE v0.1</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+			body {
+				background:#fff;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
+			}
+	</style>
+</head>
+<body>
+
+	<script src="http://threejs.org/build/three.min.js"></script>
+	<div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
+	<script>
+
+		var container, scene, camera, renderer, controls, stats;
+		var cube;
+
+
+
+		var windowHalfX = window.innerWidth / 2;
+		var windowHalfY = window.innerHeight / 2;
+
+		document.addEventListener('mousemove', onDocumentMouseMove, false);
+
+
+		init();
+		animate();
+
+		function init() {
+
+			scene = new THREE.Scene();
+			initRenderer();
+			initCamera();
+			initLight();
+
+			var jsonLoader = new THREE.JSONLoader();
+			jsonLoader.load("models/drone1.js", addModelToScene);
+
+			window.addEventListener('resize', onWindowResize, false);
+		}
+
+		function onWindowResize() {
+
+			windowHalfX = window.innerWidth / 2;
+			windowHalfY = window.innerHeight / 2;
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize(window.innerWidth, window.innerHeight);
+
+		}
+
+		function onDocumentMouseMove(event) {
+
+			mouseX = (event.clientX - windowHalfX) * 10;
+			mouseY = (event.clientY - windowHalfY) * 10;
+
+		}
+
+		function initCamera() {
+
+			camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
+			scene.add(camera);
+			camera.position.z = 50;
+		}
+
+		function initRenderer() {
+
+			renderer = new THREE.WebGLRenderer({antialias:true});
+			renderer.setClearColor(0xffffff);
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			renderer.sortObjects = false;
+
+			container = document.getElementById('ThreeJS');
+			container.appendChild(renderer.domElement);
+
+		}
+
+		function initLight() {
+
+			scene.add(new THREE.AmbientLight(0x808080));
+			var spotlight = new THREE.SpotLight(0xffff00);
+			spotlight.position.set(-60,150,-30);
+			spotlight.intensity = 3;
+			scene.add(spotlight);
+		}
+
+		function addModelToScene(geometry, materials) {
+
+			var material = new THREE.MeshFaceMaterial(materials);
+			model = new THREE.Mesh(geometry, material);
+			model.scale.set(5,5,5);
+			scene.add(model);
+		}
+
+		function animate() {
+
+			requestAnimationFrame(animate);
+			render();
+		}
+
+
+		function render() {	
+
+			camera.position.x = (mouseX - camera.position.x) * .05;
+			camera.position.y = (- mouseY - camera.position.y) * .05;
+			camera.lookAt(scene.position);
+			renderer.render(scene, camera);
+		}
+
+
+	</script>
+
+
+
+</body>
+</html>
