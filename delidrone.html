@@ -2,7 +2,7 @@
 
 <html>
 <head>
-	<title>DELIDRONE v0.3</title>
+	<title>DELIDRONE v0.1</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<style>
 			body {
@@ -25,8 +25,10 @@
 	<div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
 	<script>
 
-		var container, scene, camera, renderer, world, mouseX = 0, mouseY = 0;
-		var drone;
+		var container, scene, camera, renderer, world, mouseX = 0, mouseY = 0, mouseZ = -50;
+		var dronePath, drone;
+		var clock = new THREE.Clock();
+		var t = 0;
 
 		var windowHalfX = window.innerWidth / 2;
 		var windowHalfY = window.innerHeight / 2;
@@ -41,15 +43,19 @@
 			initRenderer();
 			initCamera();
 
+			initLight();
+		//	addWorldToScene();
+			addCurveToScene();
+
+
 			var jsonLoader = new THREE.JSONLoader();
 			jsonLoader.load("models/drone1.js", addDroneToScene);
-
-			initLight();
-			addWorldToScene();
 
 			window.addEventListener('resize', onWindowResize, false);
 			document.addEventListener('mousemove', onDocumentMouseMove, false);
 			document.addEventListener('mousedown', flipCamera, false);
+
+			setInterval(moveDrone, 30);
 
 		}
 
@@ -57,15 +63,36 @@
 
 			requestAnimationFrame(animate);
 			render();
+			update();
+		}
+
+		function update() {
+
+
+
+			//drone.translateZ(moveDistance);
+			//drone.lookAt(world.position);
+
 		}
 
 		function render() {	
 
-			camera.position.x = (mouseX - camera.position.x) * .05;
-			camera.position.y = (-mouseY - camera.position.y) * .05;
-			
+			camera.position.set(drone.position.x, drone.position.y, drone.position.z);
+			camera.position.x += (mouseX - camera.position.x) * .05;
+			camera.position.y += (-mouseY - camera.position.y) * .05;
+			camera.position.z += mouseZ;
+
 			camera.lookAt(drone.position);
 			renderer.render(scene, camera);
+
+		}
+
+		function moveDrone() {
+
+			drone.position = dronePath.getPointAt(t);
+			drone.lookAt(dronePath.getPointAt( ( t + 30 / dronePath.getLength() ) % 1 ));
+
+			t = (t>0.9) ? 0 : t + 0.0025;
 		}
 
 	</script>
