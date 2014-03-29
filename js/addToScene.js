@@ -23,14 +23,13 @@ var addWorldToScene = function () {
 	var cityGeometry= new THREE.Geometry();
 	for( var i = 0; i < 2000; i ++ ) {
 
-	  buildingMesh.position.x   = Math.floor( Math.random() * 200 - 100 ) * 10;
-	  buildingMesh.position.z   = Math.floor( Math.random() * 200 - 100 ) * 10;
-	  buildingMesh.rotation.y   = Math.random()*Math.PI*2;
-	  buildingMesh.scale.x  = Math.random() * Math.random() * Math.random() * Math.random() * 100 + 10;
-	  buildingMesh.scale.y  = (Math.random() * Math.random() * Math.random() * buildingMesh.scale.x) * 30 + 8;
-	  buildingMesh.scale.z  = Math.random() * Math.random() * Math.random() * Math.random() * 100 + 10;
-
-	  THREE.GeometryUtils.merge( cityGeometry, buildingMesh );
+		buildingMesh.position.x = Math.floor( Math.random() * 200 - 100 ) * 40;
+		buildingMesh.position.z = Math.floor( Math.random() * 200 - 100 ) * 40;
+		buildingMesh.rotation.y = Math.random()*Math.PI*2;
+		buildingMesh.scale.x = Math.random() * 100 + 10;
+		buildingMesh.scale.y = (Math.random() * buildingMesh.scale.x) * 30 + 10;
+		buildingMesh.scale.z = Math.random() * 100 + 10;
+		THREE.GeometryUtils.merge( cityGeometry, buildingMesh );
 	}
 
 	var material  = new THREE.MeshLambertMaterial({color:0x202020});
@@ -38,4 +37,35 @@ var addWorldToScene = function () {
 
 	scene.add(cityMesh);
 	scene.add(floor);
+};
+
+var addCurveToScene = function() {
+
+	spline = new THREE.SplineCurve3([
+			   new THREE.Vector3( 0, 0, 0 ),
+			   new THREE.Vector3( 0, 200, 0 ),
+			   new THREE.Vector3( 150, 150, 0 ),
+			   new THREE.Vector3( 150, 50, 50 ),
+			   new THREE.Vector3( 250, 100, 0 ),
+			   new THREE.Vector3( -250, 100, -50 ),
+			   new THREE.Vector3( 200, 200, -200 ),
+
+	]);
+
+	var material = new THREE.LineBasicMaterial({
+		color: 0x0ff000,
+	});
+
+	var geometry = new THREE.Geometry();
+	var splinePoints = spline.getPoints(50);
+
+	for (var i = 0; i < splinePoints.length; i++) {
+		geometry.vertices.push(splinePoints[i]);
+	};
+
+	var line = new THREE.Line(geometry, material);
+	
+	dronePath = spline;
+	scene.add(line);
+
 };
