@@ -6,6 +6,7 @@ var onWindowResize = function() {
 	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.updateProjectionMatrix();
 	renderer.setSize(window.innerWidth, window.innerHeight);
+	controls.handleResize();
 };
 
 var onDocumentMouseMove = function(event) {
@@ -14,5 +15,5 @@ var onDocumentMouseMove = function(event) {
 };
 
 var flipCamera = function() {
-	camera.position.z = -camera.position.z;
+	mouseZ = -mouseZ;
 };
