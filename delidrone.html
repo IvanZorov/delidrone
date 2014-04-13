@@ -20,16 +20,20 @@
 	<script src="js/eventHandlers.js"></script>
 	<script src="js/addToScene.js"></script>
 	<script src="js/inits.js"></script>
+	<script src="js/drone.js"></script>
+	<script src="js/cameras.js"></script>
+	<script src="js/firstPersonControls.js"></script>
 
 
 	<div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
 	<script>
 
-		var container, scene, camera, renderer, world, mouseX = 0, mouseY = 0, mouseZ = -50;
+		var container, scene, camera, mapCamera, renderer, world, controls;
+		var mouseX = 0, mouseY = 0, mouseZ = -50;
 		var dronePath, drone;
-		var clock = new THREE.Clock();
 		var t = 0;
 
+		var clock = new THREE.Clock();
 		var windowHalfX = window.innerWidth / 2;
 		var windowHalfY = window.innerHeight / 2;
 
@@ -39,60 +43,42 @@
 		function init() {
 
 			scene = new THREE.Scene();
-
 			initRenderer();
-			initCamera();
-
 			initLight();
-		//	addWorldToScene();
+			addWorldToScene();
+			initCamera();
 			addCurveToScene();
 
+			controls = new THREE.FirstPersonControls( camera );
+			controls.movementSpeed = 1000;
+			controls.lookSpeed = 0.125;
+			controls.lookVertical = true;
 
-			var jsonLoader = new THREE.JSONLoader();
-			jsonLoader.load("models/drone1.js", addDroneToScene);
+			launchDrone();
 
 			window.addEventListener('resize', onWindowResize, false);
-			document.addEventListener('mousemove', onDocumentMouseMove, false);
-			document.addEventListener('mousedown', flipCamera, false);
-
-			setInterval(moveDrone, 30);
+	//		document.addEventListener('mousemove', onDocumentMouseMove, false);
+	//		document.addEventListener('mousedown', flipCamera, false);
 
 		}
 
 		function animate() {
 
 			requestAnimationFrame(animate);
-			render();
+
 			update();
+			render();
 		}
 
 		function update() {
 
-
-
-			//drone.translateZ(moveDistance);
-			//drone.lookAt(world.position);
-
+			camera.update();
 		}
 
 		function render() {	
 
-			camera.position.set(drone.position.x, drone.position.y, drone.position.z);
-			camera.position.x += (mouseX - camera.position.x) * .05;
-			camera.position.y += (-mouseY - camera.position.y) * .05;
-			camera.position.z += mouseZ;
-
-			camera.lookAt(drone.position);
-			renderer.render(scene, camera);
-
-		}
-
-		function moveDrone() {
-
-			drone.position = dronePath.getPointAt(t);
-			drone.lookAt(dronePath.getPointAt( ( t + 30 / dronePath.getLength() ) % 1 ));
-
-			t = (t>0.9) ? 0 : t + 0.0025;
+			var w = window.innerWidth, h = window.innerHeight;
+			renderer.render( scene, camera );
 		}
 
 	</script>
