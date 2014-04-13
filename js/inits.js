@@ -1,11 +1,4 @@
 
-var initCamera = function() {
-
-	camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
-	scene.add(camera);
-	camera.position.z = -50;
-};
-
 var initRenderer = function() {
 
 	renderer = new THREE.WebGLRenderer({antialias:true});
