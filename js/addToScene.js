@@ -1,9 +1,5 @@
-
 var addWorldToScene = function () {
-
-	var floor = new THREE.Mesh(new THREE.PlaneGeometry(100000, 100000, 1, 1), new	THREE.MeshPhongMaterial({ color:0x050505, side: THREE.BackSide }));
-	floor.rotation.x = Math.PI / 2;
-
+	
 	var geometry = new THREE.CubeGeometry( 1, 1, 1 );
 	geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0.5, 0 ) );
 	var buildingMesh= new THREE.Mesh( geometry );
@@ -24,7 +20,6 @@ var addWorldToScene = function () {
 	var cityMesh = new THREE.Mesh(cityGeometry, material );
 	world = cityMesh;
 	scene.add(cityMesh);
-	scene.add(floor);
 };
 
 var addCurveToScene = function() {
@@ -55,5 +50,96 @@ var addCurveToScene = function() {
 	
 	dronePath = spline;
 	scene.add(line);
+
+};
+
+var addSkyBoxToScene = function() {
+
+				var cubeMap = new THREE.Texture( [] );
+				cubeMap.format = THREE.RGBFormat;
+				cubeMap.flipY = false;
+
+				var loader = new THREE.ImageLoader();
+				loader.load( 'textures/skyboxsun25degtest.png', function ( image ) {
+
+					var getSide = function ( x, y ) {
+
+						var size = 1024;
+
+						var canvas = document.createElement( 'canvas' );
+						canvas.width = size;
+						canvas.height = size;
+
+						var context = canvas.getContext( '2d' );
+						context.drawImage( image, - x * size, - y * size );
+
+						return canvas;
+
+					};
+
+					cubeMap.image[ 0 ] = getSide( 2, 1 ); // px
+					cubeMap.image[ 1 ] = getSide( 0, 1 ); // nx
+					cubeMap.image[ 2 ] = getSide( 1, 0 ); // py
+					cubeMap.image[ 3 ] = getSide( 1, 2 ); // ny
+					cubeMap.image[ 4 ] = getSide( 1, 1 ); // pz
+					cubeMap.image[ 5 ] = getSide( 3, 1 ); // nz
+					cubeMap.needsUpdate = true;
+
+				} );
+
+				var cubeShader = THREE.ShaderLib['cube'];
+				cubeShader.uniforms['tCube'].value = cubeMap;
+
+				var skyBoxMaterial = new THREE.ShaderMaterial( {
+					fragmentShader: cubeShader.fragmentShader,
+					vertexShader: cubeShader.vertexShader,
+					uniforms: cubeShader.uniforms,
+					depthWrite: false,
+					side: THREE.BackSide
+				});
+
+				var skyBox = new THREE.Mesh(
+					new THREE.BoxGeometry( 1000000, 1000000, 1000000 ),
+					skyBoxMaterial
+				);
+				
+				scene.add( skyBox );
+};
+
+var addDirectionalLightToScene = function() {
+
+
+				directionalLight = new THREE.DirectionalLight( 0xffff55, 1 );
+				directionalLight.position.set( - 1, 0.4, - 1 );
+				scene.add( directionalLight );
+
+};
+
+var addWaterToScene = function() {
+
+				waterNormals = new THREE.ImageUtils.loadTexture( 'textures/waternormals.jpg' );
+				waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping; 
+
+				water = new THREE.Water( renderer, camera, scene, {
+					textureWidth: 512, 
+					textureHeight: 512,
+					waterNormals: waterNormals,
+					alpha: 	1.0,
+					sunDirection: directionalLight.position.normalize(),
+					sunColor: 0xffffff,
+					waterColor: 0x001e0f,
+					distortionScale: 50.0,
+				} );
+
+
+				mirrorMesh = new THREE.Mesh(
+					new THREE.PlaneGeometry( parameters.width * 500, parameters.height * 500, 50, 50 ), 
+					water.material
+				);
+				
+
+				mirrorMesh.add( water );
+				mirrorMesh.rotation.x = - Math.PI * 0.5;
+				scene.add( mirrorMesh );
 
 };
