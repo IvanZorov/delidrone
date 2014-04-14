@@ -1,6 +1,6 @@
 var initCamera = function() {
 
-	camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 30000);
+	camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000000);
 	camera.update = function() {
 		controls.update(clock.getDelta());
 	};
