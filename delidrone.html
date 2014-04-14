@@ -23,6 +23,8 @@
 	<script src="js/drone.js"></script>
 	<script src="js/cameras.js"></script>
 	<script src="js/firstPersonControls.js"></script>
+	<script src="js/Mirror.js"></script>
+	<script src="js/WaterShader.js"></script>
 
 
 	<div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
@@ -32,6 +34,19 @@
 		var mouseX = 0, mouseY = 0, mouseZ = -50;
 		var dronePath, drone;
 		var t = 0;
+		
+		var waterNormals;
+		
+		var parameters = {
+			width: 2000,
+			height: 2000,
+			widthSegments: 250,
+			heightSegments: 250,
+			depth: 1500,
+			param: 4,
+			filterparam: 1
+		}
+
 
 		var clock = new THREE.Clock();
 		var windowHalfX = window.innerWidth / 2;
@@ -48,6 +63,9 @@
 			addWorldToScene();
 			initCamera();
 			addCurveToScene();
+			addSkyBoxToScene();
+			addDirectionalLightToScene();
+			addWaterToScene();
 
 			controls = new THREE.FirstPersonControls( camera );
 			controls.movementSpeed = 1000;
@@ -77,7 +95,9 @@
 
 		function render() {	
 
+			water.material.uniforms.time.value += 1.0 / 60.0;
 			var w = window.innerWidth, h = window.innerHeight;
+			water.render();
 			renderer.render( scene, camera );
 		}
 
