@@ -11,5 +11,5 @@ var initRenderer = function() {
 
 var initLight = function() {
 
-	scene.add(new THREE.AmbientLight(0x808080));
+	addDirectionalLightToScene();
 };
