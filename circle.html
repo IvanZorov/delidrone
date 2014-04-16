@@ -1,0 +1,128 @@
+<!doctype html>
+
+<html>
+<head>
+	<title>DELIDRONE v0.1</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+			body {
+				background:#fff;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
+			}
+	</style>
+</head>
+<body>
+
+	<script src="http://threejs.org/build/three.min.js"></script>
+	<script src="js/eventHandlers.js"></script>
+	<script src="js/addToScene.js"></script>
+	<script src="js/inits.js"></script>
+	<script src="js/drone.js"></script>
+	<script src="js/cameras.js"></script>
+	<script src="js/firstPersonControls.js"></script>
+	<script src="js/mirror.js"></script>
+	<script src="js/waterShader.js"></script>
+
+	<div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
+	<script>
+
+		var container, scene, camera, mapCamera, renderer, world, controls;
+		var mouseX = 0, mouseY = 0, mouseZ = -50;
+		var dronePath, drone;
+		var t = 0;
+
+		var waterNormals;
+		
+		var parameters = {
+			width: 2000,
+			height: 2000,
+			widthSegments: 250,
+			heightSegments: 250,
+			depth: 1500,
+			param: 4,
+			filterparam: 1
+		};
+
+		var clock = new THREE.Clock();
+		var windowHalfX = window.innerWidth / 2;
+		var windowHalfY = window.innerHeight / 2;
+
+		var projector = new THREE.Projector(),
+			mouse_vector = new THREE.Vector3(),
+			mouse = { x: 0, y: 0, z: 1 },
+			ray = new THREE.Raycaster(new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,0)),
+			intersects = [];
+
+		init();
+		animate();
+
+		
+
+		function init() {
+
+			scene = new THREE.Scene();
+			initRenderer();
+			initLight();
+			addCityToScene();
+			initCamera();
+			addSkyBoxToScene();
+			addWaterToScene();
+				
+			var addDroneToScene = function(geometry, materials) {
+
+				model = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials));
+				model.scale.set(1,1,1);
+				drone = model;
+				scene.add(drone);
+			};	
+	
+			var jsonLoader = new THREE.JSONLoader();
+			jsonLoader.load("models/drone1.js", addDroneToScene);
+
+			camera.update = function() {
+  			camera.position.set(drone.position.x, drone.position.y, drone.position.z);
+  			camera.position.x += (mouseX - camera.position.x) * .05;
+  			camera.position.y += (-mouseY - camera.position.y) * .05;
+  			camera.position.z += mouseZ;
+ 			camera.lookAt(drone.position);
+ 			}
+	
+			controls = new THREE.FirstPersonControls(camera);
+			controls.movementSpeed = 1000;
+			controls.lookSpeed = 0.125;
+			controls.lookVertical = true;
+
+			window.addEventListener('resize', onWindowResize, false);
+			document.addEventListener('mousemove', onDocumentMouseMove, false);
+			renderer.domElement.addEventListener('mousedown', selectBuilding);
+
+		}
+
+		function animate() {
+
+			requestAnimationFrame(animate);
+
+			update();
+			render();
+		}
+
+		function update() {
+			drone.translateZ(50);
+			drone.rotation.y += 50;
+			camera.update();
+		}
+
+		function render() {	
+
+			water.material.uniforms.time.value += 1.0 / 60.0;
+			var w = window.innerWidth, h = window.innerHeight;
+			water.render();
+			renderer.render(scene, camera);
+		}
+
+	</script>
+</body>
+</html>
