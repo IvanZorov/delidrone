@@ -89,15 +89,11 @@
   			camera.position.z += mouseZ;
  			camera.lookAt(drone.position);
  			}
-	
-			 
-
+ 			
 			controls = new THREE.FirstPersonControls(camera);
 			controls.movementSpeed = 1000;
 			controls.lookSpeed = 0.125;
 			controls.lookVertical = true;
-
-			alert('Use QWASD+Mouse to control the camera,\nUse Mouse1 to select a building.')
 
 			window.addEventListener('resize', onWindowResize, false);
 			document.addEventListener('mousemove', onDocumentMouseMove, false);
